@@ -29,6 +29,24 @@
         <el-menu-item index="/admin/courses/create">Добавить курс</el-menu-item>
       </el-sub-menu>
 
+      <el-sub-menu index="orders">
+        <template #title>
+          <i class="el-icon-test"></i>
+          <span>Заказы</span>
+        </template>
+        <el-menu-item index="/admin/testList">Список тестов</el-menu-item>
+        <el-menu-item index="/admin/answersList">Ответы учеников</el-menu-item>
+      </el-sub-menu>
+
+      <el-sub-menu index="services">
+        <template #title>
+          <i class="el-icon-test"></i>
+          <span>Услуги</span>
+        </template>
+        <el-menu-item index="/admin/testList">Список тестов</el-menu-item>
+        <el-menu-item index="/admin/answersList">Ответы учеников</el-menu-item>
+      </el-sub-menu>
+
       <el-sub-menu index="tests">
         <template #title>
           <i class="el-icon-test"></i>
@@ -53,20 +71,22 @@
 <style scoped>
 .admin-layout {
   display: flex;
-  height: 100vh;
+  height: 100vh; /* растягиваем на весь экран */
+  overflow: hidden;
   width: 100vw;
-  background: #fff;
 }
 
 .sidebar {
   width: 240px;
-  border-right: 1px solid #eee;
   height: 100%;
+  border-right: 1px solid #eee;
 }
 
 .main-content {
-  flex: 1;
-  padding: 30px;
+  flex-grow: 1; /* занимает всё оставшееся пространство */
+  padding: 24px;
   overflow-y: auto;
+  background: #f9f9f9;
 }
+
 </style>

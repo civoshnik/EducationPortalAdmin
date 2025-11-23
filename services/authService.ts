@@ -3,6 +3,8 @@ import type UserEntity  from '../interfaces/userEntity';
 import type RegisterUser from '../interfaces/RegisterUser';
 import type auth from '../interfaces/auth';
 import type authRespomse from '../interfaces/authResponse'
+import type PaginatedResult from '../interfaces/paginatedResult'
+
 
 export interface IAuthService {
   getUser(id: string): Promise<UserEntity>;
@@ -11,9 +13,11 @@ export interface IAuthService {
 
   auth(formData: auth) : Promise<authRespomse>;
 
-  getPaginatedStudentList(page: number, pageSize: number) : Promise<UserEntity[]>;
+  getPaginatedStudentList(page: number, pageSize: number) : Promise<PaginatedResult<UserEntity>>;
 
-  getPaginatedTeacherList(page: number, pageSize: number) : Promise<UserEntity[]>;
+  getPaginatedTeacherList(page: number, pageSize: number) : Promise<PaginatedResult<UserEntity>>;
+
+  deleteUser(UserId: string) : Promise<void>;
 }
 
 export default new class authService implements IAuthService {
@@ -31,17 +35,21 @@ export default new class authService implements IAuthService {
       return response.data;
     }
 
-    public async getPaginatedStudentList(page: number, pageSize: number): Promise<UserEntity[]> {
+    public async getPaginatedStudentList(page: number, pageSize: number): Promise<PaginatedResult<UserEntity>> {
       const response = await axios.get('/auth/paginatedStudentList', {
         params: { page, pageSize }
         })
       return response.data
     }
 
-    public async getPaginatedTeacherList(page: number, pageSize: number): Promise<UserEntity[]> {
+    public async getPaginatedTeacherList(page: number, pageSize: number): Promise<PaginatedResult<UserEntity>> {
       const response = await axios.get('/auth/paginatedTeacherList', {
         params: { page, pageSize }
         })
       return response.data
+    }
+
+    public async deleteUser(UserId: string): Promise<void> {
+      return await axios.delete(`/auth/deleteUser/${UserId}`)
     }
 }

@@ -4,7 +4,7 @@ export default interface UserEntity {
     lastName: string,
     login: string,
     email: string,
-    role: string,
+    role: number,
     phone: string,
     createdAt: Date,
     modifiedAt: Date | undefined

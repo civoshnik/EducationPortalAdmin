@@ -78,4 +78,14 @@ h2 {
   color: black;
 }
 
+.el-table {
+  font-size: 16px;
+}
+
+.el-table .el-table__cell {
+  padding: 20px 10px; /* сверху/снизу 20px, слева/справа 10px */
+}
+
+
+
 </style>

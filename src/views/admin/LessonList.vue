@@ -22,44 +22,42 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
-import lessonService from '../../../services/lessonService';
-import type LessonEntity from '../../../interfaces/lessonEntity';
-import { ElLoading } from 'element-plus';
-
+import lessonService from '../../../services/lessonService'
+import type LessonEntity from '../../../interfaces/lessonEntity'
+import { ElLoading } from 'element-plus'
 
 const lessons = ref<LessonEntity[]>([])
 const page = ref(1)
 const pageSize = ref(10)
-const total = ref(100)
+const total = ref(0)
 
-const fetchCourses = async () => {
+const fetchLessons = async () => {
   const loadingInstance = ElLoading.service({
     lock: true,
-    text: 'Загружаем курсы...',
+    text: 'Загружаем уроки...',
     background: 'rgba(0, 0, 0, 0.4)',
     spinner: 'el-icon-loading',
   })
 
   try {
     const result = await lessonService.getPagedLessons(page.value, pageSize.value)
-    lessons.value = Array.isArray(result) ? result : []
+    lessons.value = result.items || []
+    total.value = result.totalCount || lessons.value.length
   } catch (error) {
-    console.error('Ошибка загрузки курсов:', error)
+    console.error('Ошибка загрузки уроков:', error)
     lessons.value = []
+    total.value = 0
   } finally {
     loadingInstance.close()
   }
 }
 
-
-
 const handlePageChange = (newPage: number) => {
   page.value = newPage
-  fetchCourses()
+  fetchLessons()
 }
 
-onMounted(fetchCourses);
+onMounted(fetchLessons)
 </script>
 
 
