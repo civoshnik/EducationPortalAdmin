@@ -1,6 +1,16 @@
 <template>
   <div>
     <h2 align="center">Список курсов</h2>
+    <div style="margin: 20px 0; text-align: right;">
+    <el-button 
+      type="default"
+      class="back-btn"
+      @click="$router.push('/admin/courses/create')"
+    >
+      Добавить курс
+    </el-button>
+    </div>
+
     <el-table :data="courses" style="width: 100%">
       <el-table-column prop="name" label="Название" />
       <el-table-column prop="category" label="Категория" />
@@ -13,6 +23,13 @@
           <el-tag :type="row.isPublished ? 'success' : 'info'">
             {{ row.isPublished ? 'Да' : 'Нет' }}
           </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="Действие" width="120">
+        <template #default="{ row }">
+          <el-button type="primary" size="small" @click="openCourse(row.courseId)">
+            Открыть
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -31,16 +48,17 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
 import courseService from '../../../services/courseService';
 import type CourseEntity from '../../../interfaces/courseEntity';
 import { ElLoading } from 'element-plus';
+import router from '@/router';
 
 
 const courses = ref<CourseEntity[]>([])
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(100)
+const courseId = ref('')
 
 const fetchCourses = async () => {
   const loadingInstance = ElLoading.service({
@@ -52,16 +70,20 @@ const fetchCourses = async () => {
 
   try {
     const result = await courseService.getPagedCourses(page.value, pageSize.value)
-    courses.value = Array.isArray(result) ? result : []
+    courses.value = result.items || []
+    total.value = result.totalCount || 0
   } catch (error) {
     console.error('Ошибка загрузки курсов:', error)
     courses.value = []
+    total.value = 0
   } finally {
     loadingInstance.close()
   }
 }
 
-
+const openCourse = async (courseId: string) => {
+  await router.push(`/admin/courses/${courseId}`)
+}
 
 const handlePageChange = (newPage: number) => {
   page.value = newPage

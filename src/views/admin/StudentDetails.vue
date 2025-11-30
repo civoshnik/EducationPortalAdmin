@@ -1,12 +1,19 @@
 <template>
   <div class="student-details">
     <h2>Информация о пользователе</h2>
-    <el-button
+    <el-button v-if="student.role === 1"
       type="default"
       class="back-btn"
       @click="$router.push('/admin/users/studentList')"
     >
-      ← Назад
+      ← Назад к списку учеников
+    </el-button>
+    <el-button v-if="student.role === 2"
+      type="default"
+      class="back-btn"
+      @click="$router.push('/admin/users/teacherList')"
+    >
+      ← Назад к списку учителей
     </el-button>
 
     <el-tabs v-model="activeTab">
@@ -66,11 +73,13 @@
       </el-tab-pane>
 
       <el-tab-pane label="Курсы" name="courses">
-        <el-table :data="enrollments" height="600" stripe>
-          <el-table-column prop="courseName" label="Курс" />
-          <el-table-column prop="progressPercent" label="Прогресс (%)" />
-          <el-table-column prop="status" label="Статус" />
-          <el-table-column prop="enrolledAt" label="Дата начала" />
+        <el-table :data="courses" height="600" stripe>
+          <el-table-column prop="name" label="Курс" />
+          <el-table-column prop="category" label="Категория" />
+          <el-table-column prop="level" label="Уровень" />
+          <el-table-column prop="durationHours" label="Длительность" />
+          <el-table-column prop="creator" label="Создатель" />
+          <el-table-column prop="isPublished" label="Опубликован" />
         </el-table>
       </el-tab-pane>
     </el-tabs>
@@ -86,6 +95,8 @@ import { ElLoading } from 'element-plus'
 import router from '@/router'
 import type { orderEntity } from '../../../interfaces/orderEntity'
 import orderService from '../../../services/orderService'
+import type CourseEntity from '../../../interfaces/courseEntity'
+import courseService from '../../../services/courseService'
 
 const route = useRoute()
 
@@ -108,6 +119,7 @@ const roleLabel = computed(() => {
 })
 
 const orders = ref<orderEntity[]>([])
+const courses = ref<CourseEntity[]>([])
 const enrollments = ref([])
 const activeTab = ref('profile')
 const isBlocked = ref(false)
@@ -126,6 +138,7 @@ onMounted(async () => {
     student.value = user
   }
   orders.value = await orderService.getUserOrders(id)
+  courses.value = await courseService.getUserCourses(id)
   loadingInstance.close()
 })
 

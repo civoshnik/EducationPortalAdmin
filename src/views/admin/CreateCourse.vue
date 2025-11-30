@@ -38,6 +38,7 @@
       <el-form-item>
         <el-button type="primary" @click="submitForm">Сохранить</el-button>
         <el-button @click="resetForm">Сбросить</el-button>
+        <el-button type="danger" @click="cancelAdd">Отмена</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -48,6 +49,7 @@ import { ref } from 'vue'
 import { ElMessage, ElLoading } from 'element-plus'
 import type { FormInstance } from 'element-plus'
 import courseService from '../../../services/courseService'
+import router from '@/router'
 
 const formRef = ref<FormInstance>()
 const course = ref({
@@ -84,6 +86,10 @@ const submitForm = async () => {
       }
     }
   })
+}
+
+const cancelAdd = async () => {
+  await router.push("/admin/courseList")
 }
 
 const resetForm = () => {

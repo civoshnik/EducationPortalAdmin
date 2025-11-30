@@ -1,6 +1,7 @@
 import type LessonEntity from '../interfaces/lessonEntity';
 import axios from 'axios';
 import type paginatedResult from '../interfaces/paginatedResult';
+import type lessonEntity from '../interfaces/lessonEntity';
 
 export interface ILessonService {
 
@@ -14,6 +15,11 @@ export default new class lessonService implements ILessonService {
     const response = await axios.get('/lessons/paginatedLessonList', {
       params: { page, pageSize }
     })
+    return response.data
+  }
+
+  public async getCourseLessons(courseId: string): Promise<lessonEntity[]> {
+    const response = await axios.get(`/courses/${courseId}/lessons`)
     return response.data
   }
 }

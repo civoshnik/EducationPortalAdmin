@@ -4,20 +4,21 @@ import type RegisterUser from '../interfaces/RegisterUser';
 import type auth from '../interfaces/auth';
 import type authRespomse from '../interfaces/authResponse'
 import type PaginatedResult from '../interfaces/paginatedResult'
+import type CourseEntity from '../interfaces/courseEntity';
 
 
 export interface IAuthService {
-  getUser(id: string): Promise<UserEntity>;
+  getUser(id: string): Promise<UserEntity>
 
-  registerUser(formData: RegisterUser) : Promise<void>;
+  registerUser(formData: RegisterUser) : Promise<void>
 
-  auth(formData: auth) : Promise<authRespomse>;
+  auth(formData: auth) : Promise<authRespomse>
 
-  getPaginatedStudentList(page: number, pageSize: number) : Promise<PaginatedResult<UserEntity>>;
+  getPaginatedStudentList(page: number, pageSize: number) : Promise<PaginatedResult<UserEntity>>
 
-  getPaginatedTeacherList(page: number, pageSize: number) : Promise<PaginatedResult<UserEntity>>;
+  getPaginatedTeacherList(page: number, pageSize: number) : Promise<PaginatedResult<UserEntity>>
 
-  deleteUser(UserId: string) : Promise<void>;
+  deleteUser(UserId: string) : Promise<void>
 }
 
 export default new class authService implements IAuthService {

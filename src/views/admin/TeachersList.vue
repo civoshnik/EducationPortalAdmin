@@ -44,7 +44,7 @@ const total = ref(0)
 const router = useRouter()
 
 const openTeacher = async (id: string) => {
-  await router.push(`/admin/users/teacherList/${id}`)
+  await router.push(`/admin/users/${id}`)
 }
 
 const fetchTeachers = async () => {
