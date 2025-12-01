@@ -17,7 +17,11 @@
       <el-table-column prop="level" label="Уровень" />
       <el-table-column prop="durationHours" label="Длительность (ч)" />
       <el-table-column prop="creator" label="Автор" />
-      <el-table-column prop="createdAt" label="Создан" />
+      <el-table-column label="Создан">
+        <template #default="{ row }">
+          {{ formatDate(row.createdAt) }}
+        </template>
+      </el-table-column>
       <el-table-column prop="isPublished" label="Опубликован">
         <template #default="{ row }">
           <el-tag :type="row.isPublished ? 'success' : 'info'">
@@ -60,13 +64,20 @@ const pageSize = ref(10)
 const total = ref(100)
 const courseId = ref('')
 
-const fetchCourses = async () => {
-  const loadingInstance = ElLoading.service({
-    lock: true,
-    text: 'Загружаем курсы...',
-    background: 'rgba(0, 0, 0, 0.4)',
-    spinner: 'Loading',
+function formatDate(date: string | Date) {
+  if (!date) return ''
+  const d = new Date(date)
+  return d.toLocaleString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
   })
+}
+
+const fetchCourses = async () => {
+  const loading = ElLoading.service({ text: 'Загрузка...' })
 
   try {
     const result = await courseService.getPagedCourses(page.value, pageSize.value)
@@ -77,7 +88,7 @@ const fetchCourses = async () => {
     courses.value = []
     total.value = 0
   } finally {
-    loadingInstance.close()
+    loading.close()
   }
 }
 

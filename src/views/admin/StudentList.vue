@@ -6,7 +6,11 @@
       <el-table-column prop="lastName" label="Фамилия" />
       <el-table-column prop="login" label="Логин" />
       <el-table-column prop="email" label="Email" />
-      <el-table-column prop="role" label="Роль" />
+      <el-table-column label="Роль">
+        <template #default="{ row }">
+          {{ roleText(row.role) }}
+        </template>
+      </el-table-column>
       <el-table-column prop="phone" label="Телефон" />
       <el-table-column label="Действие" width="120">
         <template #default="{ row }">
@@ -43,17 +47,21 @@ const total = ref(0)
 
 const router = useRouter()
 
+const roleText = (role: number) => {
+  switch (role) {
+    case 0: return 'Администратор'
+    case 1: return 'Ученик'
+    case 2: return 'Учитель'
+    default: return 'Неизвестно'
+  }
+}
+
 const openStudent = async (id: string) => {
   await router.push(`/admin/users/${id}`)
 }
 
 const fetchStudents = async () => {
-  const loadingInstance = ElLoading.service({
-    lock: true,
-    text: 'Загружаем студентов...',
-    background: 'rgba(0, 0, 0, 0.4)',
-    spinner: 'el-icon-loading',
-  })
+  const loading = ElLoading.service({ text: 'Загрузка...' })
 
   try {
     const result = await authService.getPaginatedStudentList(page.value, pageSize.value)
@@ -64,7 +72,7 @@ const fetchStudents = async () => {
     students.value = []
     total.value = 0
   } finally {
-    loadingInstance.close()
+    loading.close()
   }
 }
 

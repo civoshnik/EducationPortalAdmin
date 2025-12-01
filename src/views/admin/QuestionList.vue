@@ -34,12 +34,7 @@ const pageSize = ref(10)
 const total = ref(100)
 
 const fetchCourses = async () => {
-  const loadingInstance = ElLoading.service({
-    lock: true,
-    text: 'Загружаем курсы...',
-    background: 'rgba(0, 0, 0, 0.4)',
-    spinner: 'el-icon-loading',
-  })
+  const loading = ElLoading.service({ text: 'Загрузка...' })
 
   try {
     const result = await questionService.getPagedQuestions(page.value, pageSize.value)
@@ -48,7 +43,7 @@ const fetchCourses = async () => {
     console.error('Ошибка загрузки курсов:', error)
     questions.value = []
   } finally {
-    loadingInstance.close()
+    loading.close()
   }
 }
 

@@ -11,6 +11,7 @@ import QuestionList from '@/views/admin/QuestionList.vue'
 import StudentDetails from '@/views/admin/StudentDetails.vue'
 import TestList from '../views/admin/TestList.vue'
 import CourseDetails from '@/views/admin/CourseDetails.vue'
+import EditCourse from '@/views/admin/EditCourse.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,6 +29,7 @@ const router = createRouter({
     { path: 'questionList', component: QuestionList },
     { path: 'courses/create', component: CreateCourse },
     { path: 'courses/:id', component: CourseDetails },
+    { path: 'courses/edit/:id', component: EditCourse },
     { path: 'testList', component: TestList },
     { path: 'settings', component: AdminSettings }
   ]

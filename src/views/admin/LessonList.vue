@@ -32,12 +32,7 @@ const pageSize = ref(10)
 const total = ref(0)
 
 const fetchLessons = async () => {
-  const loadingInstance = ElLoading.service({
-    lock: true,
-    text: 'Загружаем уроки...',
-    background: 'rgba(0, 0, 0, 0.4)',
-    spinner: 'el-icon-loading',
-  })
+  const loading = ElLoading.service({ text: 'Загрузка...' })
 
   try {
     const result = await lessonService.getPagedLessons(page.value, pageSize.value)
@@ -48,7 +43,7 @@ const fetchLessons = async () => {
     lessons.value = []
     total.value = 0
   } finally {
-    loadingInstance.close()
+    loading.close()
   }
 }
 

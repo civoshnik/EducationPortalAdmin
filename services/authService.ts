@@ -19,6 +19,10 @@ export interface IAuthService {
   getPaginatedTeacherList(page: number, pageSize: number) : Promise<PaginatedResult<UserEntity>>
 
   deleteUser(UserId: string) : Promise<void>
+
+  editPhone(UserId: string, Phone: string) : Promise<void>
+
+  editEmail(UserId: string, Email: string) : Promise<void>
 }
 
 export default new class authService implements IAuthService {
@@ -52,5 +56,19 @@ export default new class authService implements IAuthService {
 
     public async deleteUser(UserId: string): Promise<void> {
       return await axios.delete(`/auth/deleteUser/${UserId}`)
+    }
+
+    public async editPhone(UserId: string, Phone: string) : Promise<void> {
+      return await axios.post('/auth/editPhoneUser', {
+        UserId: UserId,
+        Phone: Phone,
+      })
+    }
+
+    public async editEmail(UserId: string, Email: string) : Promise<void> {
+      return await axios.post('/auth/editEmailUser', {
+        UserId: UserId,
+        Email: Email,
+      })
     }
 }

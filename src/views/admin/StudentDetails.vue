@@ -32,12 +32,12 @@
             <div class="profile-row">
               <label class="label-text">Телефон:</label>
               <el-input v-model="student.phone" size="large" style="max-width: 300px;" />
-              <el-button type="primary" size="large">Сохранить</el-button>
+              <el-button type="primary" size="large" @click="updatePhone">Сохранить</el-button>
             </div>
             <div class="profile-row">
               <label class="label-text">Email:</label>
               <el-input v-model="student.email" size="large" style="max-width: 300px;" />
-              <el-button type="primary" size="large">Сохранить</el-button>
+              <el-button type="primary" size="large" @click="updateEmail">Сохранить</el-button>
             </div>
             <div class="profile-row">
               <label class="label-text">Пароль:</label>
@@ -67,8 +67,16 @@
         <el-table :data="orders" height="600" stripe>
           <el-table-column prop="orderId" label="ID заказа" />
           <el-table-column prop="totalPrice" label="Сумма" />
-          <el-table-column prop="status" label="Статус" />
-          <el-table-column prop="createdAt" label="Создан" />
+          <el-table-column label="Статус">
+            <template #default="{ row }">
+              {{ statusText(row.status) }}
+            </template>
+          </el-table-column>
+          <el-table-column label="Создан">
+            <template #default="{ row }">
+              {{ formatDate(row.createdAt) }}
+            </template>
+          </el-table-column>
         </el-table>
       </el-tab-pane>
 
@@ -91,7 +99,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import authService from '../../../services/authService'
 import type UserEntity from '../../../interfaces/userEntity'
-import { ElLoading } from 'element-plus'
+import { ElLoading, ElMessage, ElMessageBox } from 'element-plus'
 import router from '@/router'
 import type { orderEntity } from '../../../interfaces/orderEntity'
 import orderService from '../../../services/orderService'
@@ -112,11 +120,33 @@ const student = ref<UserEntity>({
   modifiedAt: new Date()
 })
 
+function formatDate(date: string | Date) {
+  if (!date) return ''
+  const d = new Date(date)
+  return d.toLocaleString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
 const roleLabel = computed(() => {
   if (student.value.role === 1) return 'Ученик'
   if (student.value.role === 2) return 'Учитель'
   return 'Неизвестно'
 })
+
+const statusText = (status: number) => {
+switch (status) {
+    case 0: return 'Ожидание'
+    case 1: return 'Подтвержден'
+    case 2: return 'Оплачен'
+    case 3: return 'Отменен'
+    default: return 'Неизвестно'
+  }
+}
 
 const orders = ref<orderEntity[]>([])
 const courses = ref<CourseEntity[]>([])
@@ -124,36 +154,78 @@ const enrollments = ref([])
 const activeTab = ref('profile')
 const isBlocked = ref(false)
 const newPassword = ref('')
+const id = ref('')
+
+const phoneRegex = /^\+375(17|25|29|33|44)\d{7}$/
+const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
 
 onMounted(async () => {
-  const loadingInstance = ElLoading.service({
-    lock: true,
-    text: 'Загружаем студента...',
-    background: 'rgba(0, 0, 0, 0.4)',
-    spinner: 'el-icon-loading',
-  })
-  const id = route.params.id as string
-  const user = await authService.getUser(id)
+  const loading = ElLoading.service({ text: 'Загрузка...' })
+  id.value = String(route.params.id)
+  const user = await authService.getUser(id.value)
   if (user) {
     student.value = user
   }
-  orders.value = await orderService.getUserOrders(id)
-  courses.value = await courseService.getUserCourses(id)
-  loadingInstance.close()
+  orders.value = await orderService.getUserOrders(id.value)
+  courses.value = await courseService.getUserCourses(id.value)
+  loading.close()
 })
 
-async function deleteAccount()
-{
-  const loadingInstance = ElLoading.service({
-    lock: true,
-    text: 'Удаление...',
-    background: 'rgba(0, 0, 0, 0.4)',
-    spinner: 'el-icon-loading',
-  })
-  await authService.deleteUser(student.value.userId)
-  router.push('/admin/users/studentList')
-  loadingInstance.close()
+const updatePhone = async () => {
+  if (!phoneRegex.test(student.value.phone)) {
+    ElMessage.error('Неверный формат номера телефона!')
+    return
+  }
+
+  const loading = ElLoading.service({ text: 'Загрузка...' })
+  try {
+    await authService.editPhone(id.value, student.value.phone)
+    ElMessage.success('Телефон успешно обновлён!')
+  } catch (error) {
+    ElMessage.error('Ошибка при обновлении телефона')
+    console.log(error)
+  } finally {
+    loading.close()
+  }
 }
+
+const updateEmail = async () => {
+  if (!emailRegex.test(student.value.email)) {
+    ElMessage.error('Неверный формат email!')
+    return
+  }
+
+  const loading = ElLoading.service({ text: 'Загрузка...' })
+  try {
+    await authService.editEmail(id.value, student.value.email)
+    ElMessage.success('Email успешно обновлён!')
+  } catch (error) {
+    ElMessage.error('Ошибка при обновлении email')
+    console.log(error)
+  } finally {
+    loading.close()
+  }
+}
+
+async function deleteAccount() {
+    await ElMessageBox.confirm(
+      'Вы уверены, что хотите удалить этот аккаунт?',
+      'Подтверждение',
+      {
+        confirmButtonText: 'Удалить',
+        cancelButtonText: 'Отмена',
+        type: 'warning',
+      }
+    )
+
+    const loading = ElLoading.service({ text: 'Загрузка...' })
+
+    await authService.deleteUser(student.value.userId)
+    router.push('/admin/users/studentList')
+    ElMessage.success('Аккаунт успешно удалён!')
+    loading.close()
+  }
+  
 
 const toggleBlock = () => {
   isBlocked.value = !isBlocked.value

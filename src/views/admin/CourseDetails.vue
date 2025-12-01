@@ -50,7 +50,12 @@
               </el-tag>
             </div>
             <div class="profile-actions">
-              <el-button type="primary" size="large">Редактировать</el-button>
+              <el-button 
+                type="primary" 
+                size="large" 
+                @click="router.push(`/admin/courses/edit/${course.courseId}`)">
+                Редактировать
+              </el-button>
               <el-button type="danger" size="large" @click="deleteCourse">Удалить курс</el-button>
               <el-button type="success" size="large">Отправить уведомление</el-button>
             </div>
@@ -111,19 +116,14 @@ const lessons = ref<lessonEntity[]>([])
 const activeTab = ref('profile')
 
 onMounted(async () => {
-  const loadingInstance = ElLoading.service({
-    lock: true,
-    text: 'Загружаем курс...',
-    background: 'rgba(0, 0, 0, 0.4)',
-    spinner: 'el-icon-loading',
-  })
+  const loading = ElLoading.service({ text: 'Загрузка...' })
   const id = route.params.id as string
   const data = await courseService.getCourse(id)
   if (data) {
     course.value = data
   }
   lessons.value = await lessonService.getCourseLessons(id)
-  loadingInstance.close()
+  loading.close()
 })
 
 function formatDate(date: Date | string | undefined) {
@@ -132,15 +132,10 @@ function formatDate(date: Date | string | undefined) {
 }
 
 async function deleteCourse() {
-  const loadingInstance = ElLoading.service({
-    lock: true,
-    text: 'Удаление...',
-    background: 'rgba(0, 0, 0, 0.4)',
-    spinner: 'el-icon-loading',
-  })
+  const loading = ElLoading.service({ text: 'Загрузка...' })
   await courseService.deleteCourse(course.value.courseId)
   router.push('/admin/courseList')
-  loadingInstance.close()
+  loading.close()
 }
 </script>
 
