@@ -3,7 +3,7 @@ export default interface lessonEntity {
     courseId: string
     name: string
     content: string
-    videoURL: string
+    videoUrl: string
     createdAt: Date
     modifiedAt?: Date | undefined
 }

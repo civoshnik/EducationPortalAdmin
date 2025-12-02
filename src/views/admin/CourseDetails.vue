@@ -89,7 +89,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { ElLoading } from 'element-plus'
+import { ElLoading, ElMessageBox, ElMessage } from 'element-plus'
 import router from '@/router'
 import type CourseEntity from '../../../interfaces/courseEntity'
 import type lessonEntity from '../../../interfaces/lessonEntity'
@@ -132,9 +132,19 @@ function formatDate(date: Date | string | undefined) {
 }
 
 async function deleteCourse() {
+  await ElMessageBox.confirm(
+      'Вы уверены, что хотите удалить этот курс',
+      'Подтверждение',
+      {
+        confirmButtonText: 'Удалить',
+        cancelButtonText: 'Отмена',
+        type: 'warning',
+      }
+    )
   const loading = ElLoading.service({ text: 'Загрузка...' })
   await courseService.deleteCourse(course.value.courseId)
   router.push('/admin/courseList')
+  ElMessage.success('Курс успешно удалён!')
   loading.close()
 }
 </script>

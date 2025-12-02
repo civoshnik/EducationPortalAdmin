@@ -15,6 +15,8 @@ export interface ICourseService {
   getUserCourses(UserId: string) : Promise<CourseEntity[]>
 
   updateCourse(course: createCourseDto) : Promise<void>
+
+  getCourseList(): Promise<CourseEntity[]>
 }
 
 
@@ -29,6 +31,11 @@ export default new class courseService implements ICourseService {
   public async createCourse(course: createCourseDto): Promise<void> {
     return await axios.post('/courses/createCourse', course)
     }
+
+    public async getCourseList(): Promise<CourseEntity[]> {
+      const response = await axios.get('/courses/list')
+      return response.data
+  }
 
     public async getCourse(CourseId: string): Promise<CourseEntity> {
       const res = await axios.get(`/courses/detail/${CourseId}`)
