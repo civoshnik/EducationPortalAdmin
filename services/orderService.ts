@@ -1,6 +1,7 @@
 import axios from 'axios'
 import type {OrderServiceItem} from '../interfaces/orderServiceItem'
 import type { orderEntity } from '../interfaces/orderEntity'
+import type PaginatedResult from '../interfaces/paginatedResult'
 
 interface OrderItem {
   serviceId: string
@@ -35,6 +36,11 @@ class OrderService {
     const response = await axios.get(`/order/details/${orderId}`)
     return response.data
   }
+
+  public async getPagedOrders(page: number, pageSize: number): Promise<PaginatedResult<orderEntity>> {
+    const response = await axios.get<PaginatedResult<orderEntity>>('/order/paginatedList', { params: { page, pageSize } })
+    return response.data
+  } 
 }
 
 export default new OrderService()

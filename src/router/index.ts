@@ -15,6 +15,7 @@ import EditCourse from '@/views/admin/EditCourse.vue'
 import LessonDetails from '@/views/admin/LessonDetails.vue'
 import LessonCreate from '@/views/admin/LessonCreate.vue'
 import LessonEdit from '@/views/admin/LessonEdit.vue'
+import Orderslist from '@/views/admin/Orders/Orderslist.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -36,6 +37,7 @@ const router = createRouter({
     { path: 'courses/create', component: CreateCourse },
     { path: 'courses/:id', component: CourseDetails },
     { path: 'courses/edit/:id', component: EditCourse },
+    { path: 'ordersList', component: Orderslist },
     { path: 'testList', component: TestList },
     { path: 'settings', component: AdminSettings }
   ]

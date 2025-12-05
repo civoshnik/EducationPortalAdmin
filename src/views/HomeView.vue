@@ -31,7 +31,7 @@
         <template #title>
           <span>Заказы</span>
         </template>
-        <el-menu-item index="/admin/testList">Список тестов</el-menu-item>
+        <el-menu-item index="/admin/ordersList">Список заказов</el-menu-item>
         <el-menu-item index="/admin/answersList">Ответы учеников</el-menu-item>
       </el-sub-menu>
 
