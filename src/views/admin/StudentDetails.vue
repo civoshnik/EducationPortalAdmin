@@ -225,11 +225,24 @@ async function deleteAccount() {
     ElMessage.success('Аккаунт успешно удалён!')
     loading.close()
   }
-  
 
-const toggleBlock = () => {
+const toggleBlock = async (userId: string) => {
   isBlocked.value = !isBlocked.value
+  try {
+    if (isBlocked.value) {
+      await authService.setUserBlackList(userId)
+      ElMessage.success('Пользователь добавлен в чёрный список')
+    } else {
+      await authService.cancelUserBlackList(userId)
+      ElMessage.success('Пользователь исключён из чёрного списка')
+    }
+  } catch (error) {
+    ElMessage.error('Ошибка при изменении статуса пользователя')
+    console.error(error)
+    isBlocked.value = !isBlocked.value
+  }
 }
+
 </script>
 
 <style scoped>

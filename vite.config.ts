@@ -44,6 +44,11 @@ export default defineConfig({
         target: 'http://localhost:5136',
         changeOrigin: true,
       },
+      '/api/services': {
+        target: 'http://localhost:5136',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api\/services/, '/services')
+      }
     },
   },
 })

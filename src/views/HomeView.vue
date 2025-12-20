@@ -32,7 +32,13 @@
           <span>Заказы</span>
         </template>
         <el-menu-item index="/admin/ordersList">Список заказов</el-menu-item>
-        <el-menu-item index="/admin/answersList">Ответы учеников</el-menu-item>
+      </el-sub-menu>
+
+      <el-sub-menu index="services">
+        <template #title>
+          <span>Услуги</span>
+        </template>
+        <el-menu-item index="/admin/serviceList">Список услуг</el-menu-item>
       </el-sub-menu>
 
       <el-menu-item index="/admin/settings">

@@ -23,6 +23,10 @@ export interface IAuthService {
   editPhone(UserId: string, Phone: string) : Promise<void>
 
   editEmail(UserId: string, Email: string) : Promise<void>
+
+  setUserBlackList(userId: string): Promise<void> 
+  
+  cancelUserBlackList(userId: string): Promise<void>
 }
 
 export default new class authService implements IAuthService {
@@ -70,5 +74,13 @@ export default new class authService implements IAuthService {
         UserId: UserId,
         Email: Email,
       })
+    }
+
+    public async setUserBlackList(userId: string): Promise<void> { 
+      await axios.post(`/auth/setUserBlackList/${userId}`) 
+    } 
+
+    public async cancelUserBlackList(userId: string): Promise<void> { 
+      await axios.post(`/auth/cancelUserBlackList/${userId}`)
     }
 }

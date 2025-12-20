@@ -41,6 +41,11 @@ class OrderService {
     const response = await axios.get<PaginatedResult<orderEntity>>('/order/paginatedList', { params: { page, pageSize } })
     return response.data
   } 
+
+  public async getOrdersByService(serviceId: string): Promise<orderEntity[]> { 
+    const response = await axios.get('/order/getOrdersByService', { params: { serviceId } }) 
+    return response.data 
+  }
 }
 
 export default new OrderService()
