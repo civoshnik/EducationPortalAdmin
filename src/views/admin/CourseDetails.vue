@@ -57,7 +57,6 @@
                 Редактировать
               </el-button>
               <el-button type="danger" size="large" @click="deleteCourse">Удалить курс</el-button>
-              <el-button type="success" size="large">Отправить уведомление</el-button>
             </div>
           </div>
         </fieldset>

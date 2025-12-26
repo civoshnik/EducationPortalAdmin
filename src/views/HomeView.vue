@@ -15,7 +15,8 @@
           <span>Пользователи</span>
         </template>
         <el-menu-item index="/admin/users/studentList">Список учеников</el-menu-item>
-        <el-menu-item index="/admin/users/teacherList">Список учителей</el-menu-item>
+        <el-menu-item index="/admin/users/adminList">Список администраторов</el-menu-item>
+        <el-menu-item index="/admin/users/blackList">Черный список</el-menu-item>
       </el-sub-menu>
 
       <el-sub-menu index="courses">
@@ -25,6 +26,7 @@
         <el-menu-item index="/admin/courseList">Список курсов</el-menu-item>
         <el-menu-item index="/admin/lessonList">Список уроков</el-menu-item>
         <el-menu-item index="/admin/questionList">Список вопросов</el-menu-item>
+        <el-menu-item index="/admin/testList">Список тестов</el-menu-item>
       </el-sub-menu>
 
       <el-sub-menu index="orders">
@@ -40,10 +42,6 @@
         </template>
         <el-menu-item index="/admin/serviceList">Список услуг</el-menu-item>
       </el-sub-menu>
-
-      <el-menu-item index="/admin/settings">
-        <span>Настройки</span>
-      </el-menu-item>
     </el-menu>
 
     <div class="main-content">

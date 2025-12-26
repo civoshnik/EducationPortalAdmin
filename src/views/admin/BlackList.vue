@@ -1,7 +1,7 @@
 <template>
   <div>
-    <h2 align="center">Список учеников</h2>
-    <el-table :data="students" style="width: 100%" empty-text="Нет данных">
+    <h2 align="center">Черный список</h2>
+    <el-table :data="blacklist" style="width: 100%" empty-text="Нет данных">
       <el-table-column prop="firstName" label="Имя" />
       <el-table-column prop="lastName" label="Фамилия" />
       <el-table-column prop="login" label="Логин" />
@@ -12,9 +12,14 @@
         </template>
       </el-table-column>
       <el-table-column prop="phone" label="Телефон" />
+      <el-table-column prop="blacklistedAt" label="Дата блокировки">
+        <template #default="{ row }">
+          {{ formatDate(row.blacklistedAt) }}
+        </template>
+      </el-table-column>
       <el-table-column label="Действие" width="120">
         <template #default="{ row }">
-          <el-button type="primary" size="small" @click="openStudent(row.userId)">
+          <el-button type="primary" size="small" @click="openUser(row.userId)">
             Открыть
           </el-button>
         </template>
@@ -36,11 +41,21 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import authService from '../../../services/authService'
-import type UserEntity from '../../../interfaces/userEntity'
 import { ElLoading } from 'element-plus'
 import { useRouter } from 'vue-router'
 
-const students = ref<UserEntity[]>([])
+interface BlacklistUserDto {
+  userId: string
+  firstName: string
+  lastName: string
+  login: string
+  email: string
+  role: number
+  phone: string
+  blacklistedAt: string
+}
+
+const blacklist = ref<BlacklistUserDto[]>([])
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
@@ -56,20 +71,25 @@ const roleText = (role: number) => {
   }
 }
 
-const openStudent = async (id: string) => {
-  await router.push({ path: `/admin/users/${id}`, query: { from: 'studentlist' } })
+const formatDate = (date: string | Date) => {
+  if (!date) return ''
+  return new Date(date).toLocaleString('ru-RU')
 }
 
-const fetchStudents = async () => {
-  const loading = ElLoading.service({ text: 'Загрузка...' })
+const openUser = async (id: string) => {
+  await router.push({ path: `/admin/users/${id}`, query: { from: 'blacklist' } })
+  
+}
 
+const fetchBlacklist = async () => {
+  const loading = ElLoading.service({ text: 'Загрузка...' })
   try {
-    const result = await authService.getPaginatedStudentList(page.value, pageSize.value)
-    students.value = result.items || []
-    total.value = result.totalCount || students.value.length
+    const result = await authService.getPaginatedBlackList(page.value, pageSize.value)
+    blacklist.value = result.items || []
+    total.value = result.totalCount || blacklist.value.length
   } catch (error) {
-    console.error('Ошибка загрузки студентов:', error)
-    students.value = []
+    console.error('Ошибка загрузки черного списка:', error)
+    blacklist.value = []
     total.value = 0
   } finally {
     loading.close()
@@ -78,13 +98,13 @@ const fetchStudents = async () => {
 
 const handlePageChange = (newPage: number) => {
   page.value = newPage
-  fetchStudents()
+  fetchBlacklist()
 }
 
-onMounted(fetchStudents)
+onMounted(fetchBlacklist)
 </script>
 
-<style>
+<style scoped>
 h2 {
   color: black;
 }

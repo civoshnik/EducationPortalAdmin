@@ -1,19 +1,22 @@
 <template>
   <div>
     <h2 align="center">Список заказов</h2>
-
+    <el-button type="success" style="margin-bottom: 15px;" @click="exportOrders">
+    Экспорт в Excel
+    </el-button>
     <el-table :data="orders" style="width: 100%">
       <el-table-column prop="orderId" label="ID заказа" width="250" />
       <el-table-column prop="totalPrice" label="Сумма" />
       <el-table-column prop="status" label="Статус">
         <template #default="{ row }">
           <el-tag
-            :type="row.status === 'Confirmed' ? 'success' 
-                  : row.status === 'Paid' ? 'warning' 
-                  : row.status === 'Cancelled' ? 'danger' 
-                  : 'info'">
-            {{ mapStatus(row.status) }}
-          </el-tag>
+  :type="row.status === 1 ? 'success' 
+        : row.status === 2 ? 'warning' 
+        : row.status === 3 ? 'danger' 
+        : 'info'">
+  {{ mapStatus(row.status) }}
+</el-tag>
+
         </template>
       </el-table-column>
       <el-table-column label="Создан">
@@ -45,11 +48,23 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import orderService from '../../../../services/orderService'
-import type { orderEntity } from '../../../../interfaces/orderEntity'
+import type { OrderEntity } from '../../../../interfaces/orderEntity'
 import { ElLoading } from 'element-plus'
 import router from '@/router'
+import axios from 'axios'
 
-const orders = ref<orderEntity[]>([])
+async function exportOrders() {
+  const loading = ElLoading.service({ text: 'Загрузка...' })
+  const response = await axios.get('/order/export', { responseType: 'blob' })
+  const blob = new Blob([response.data], { type: response.headers['content-type'] })
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.download = 'orders.xlsx'
+  link.click()
+  loading.close()
+}
+
+const orders = ref<OrderEntity[]>([])
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
@@ -66,15 +81,18 @@ function formatDate(date: string | Date) {
   })
 }
 
-function mapStatus(status: string) {
+function mapStatus(status: number) {
   switch (status) {
-    case 'Draft': return 'Черновик'
-    case 'Confirmed': return 'Подтверждён'
-    case 'Paid': return 'Оплачен'
-    case 'Cancelled': return 'Отменён'
-    default: return status
+    case 0: return 'В ожидании'
+    case 1: return 'Подтверждён'
+    case 2: return 'Оплачен'
+    case 3: return 'Отменён'
+    default: return status.toString()
   }
 }
+
+
+
 
 const fetchOrders = async () => {
   const loading = ElLoading.service({ text: 'Загрузка...' })
@@ -92,7 +110,7 @@ const fetchOrders = async () => {
 }
 
 const openOrder = async (orderId: string) => {
-  await router.push(`/admin/orders/${orderId}`)
+  await router.push(`/admin/orders/details/${orderId}`)
 }
 
 const handlePageChange = (newPage: number) => {

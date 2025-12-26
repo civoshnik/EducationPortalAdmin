@@ -37,6 +37,6 @@ export default new class serviceService implements IServiceService {
   }
 
   public async updateService(service: createServiceDto): Promise<void> {
-    await axios.post('/services/editService', service)
+    await axios.post('/api/services/editService', service)
   }
 }

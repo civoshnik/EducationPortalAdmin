@@ -1,6 +1,7 @@
 export interface OrderServiceItem {
+  orderServiceId: string
+  orderId: string
   serviceId: string
-  serviceName: string
   quantity: number
   totalPrice: number
 }

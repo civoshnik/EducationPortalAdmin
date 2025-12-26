@@ -78,6 +78,7 @@ const submitForm = async () => {
         await courseService.createCourse(course.value)
         ElMessage.success('Курс успешно добавлен')
         resetForm()
+        await router.push("/admin/courseList")
       } catch (error) {
         ElMessage.error('Ошибка при добавлении курса')
         console.error(error)

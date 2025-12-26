@@ -1,20 +1,46 @@
 <template>
   <div class="student-details">
     <h2>Информация о пользователе</h2>
-    <el-button v-if="student.role === 1"
-      type="default"
-      class="back-btn"
-      @click="$router.push('/admin/users/studentList')"
-    >
-      ← Назад к списку учеников
-    </el-button>
-    <el-button v-if="student.role === 2"
-      type="default"
-      class="back-btn"
-      @click="$router.push('/admin/users/teacherList')"
-    >
-      ← Назад к списку учителей
-    </el-button>
+    <el-button v-if="route.query.from === 'blacklist'"
+  type="default"
+  class="back-btn"
+  @click="$router.push('/admin/users/blackList')"
+>
+  ← Назад к черному списку
+</el-button>
+
+<el-button v-else-if="route.query.from === 'adminlist'"
+  type="default"
+  class="back-btn"
+  @click="$router.push('/admin/users/adminList')"
+>
+  ← Назад к списку администраторов
+</el-button>
+
+<el-button v-else-if="route.query.from === 'studentlist'"
+  type="default"
+  class="back-btn"
+  @click="$router.push('/admin/users/studentList')"
+>
+  ← Назад к списку учеников
+</el-button>
+
+<el-button v-else-if="route.query.from === 'orderDetails'"
+  type="default"
+  class="back-btn"
+  @click="$router.push('/admin/ordersList')"
+>
+  ← Назад к списку заказов
+</el-button>
+
+<el-button v-else-if="route.query.from === 'teacherlist'"
+  type="default"
+  class="back-btn"
+  @click="$router.push('/admin/users/teacherList')"
+>
+  ← Назад к списку учителей
+</el-button>
+
 
     <el-tabs v-model="activeTab">
       <el-tab-pane label="Профиль" name="profile">
@@ -40,11 +66,6 @@
               <el-button type="primary" size="large" @click="updateEmail">Сохранить</el-button>
             </div>
             <div class="profile-row">
-              <label class="label-text">Пароль:</label>
-              <el-input v-model="newPassword" type="password" size="large" style="max-width: 300px;" />
-              <el-button type="warning" size="large">Сбросить</el-button>
-            </div>
-            <div class="profile-row">
               <label class="label-text">Роль:</label>
               <div class="value">{{ roleLabel }}</div>
             </div>
@@ -54,10 +75,11 @@
             </div>
             <div class="profile-actions">
               <el-button type="danger" size="large" @click="deleteAccount">Удалить аккаунт</el-button>
-              <el-button type="info" size="large" @click="toggleBlock">
+              <el-button type="info" size="large" @click="toggleBlock(student.userId)">
                 {{ isBlocked ? 'Разблокировать' : 'Заблокировать' }}
               </el-button>
-              <el-button type="success" size="large">Отправить уведомление</el-button>
+              <el-button type="info" size="large" @click="setStudent">Назначить учеником</el-button>
+              <el-button type="info" size="large" @click="setAdmin">Назначить администратором</el-button>
             </div>
           </div>
         </fieldset>
@@ -95,13 +117,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import authService from '../../../services/authService'
 import type UserEntity from '../../../interfaces/userEntity'
 import { ElLoading, ElMessage, ElMessageBox } from 'element-plus'
 import router from '@/router'
-import type { orderEntity } from '../../../interfaces/orderEntity'
+import type { OrderEntity } from '../../../interfaces/orderEntity'
 import orderService from '../../../services/orderService'
 import type CourseEntity from '../../../interfaces/courseEntity'
 import courseService from '../../../services/courseService'
@@ -135,6 +157,7 @@ function formatDate(date: string | Date) {
 const roleLabel = computed(() => {
   if (student.value.role === 1) return 'Ученик'
   if (student.value.role === 2) return 'Учитель'
+  if (student.value.role === 0) return 'Администратор'
   return 'Неизвестно'
 })
 
@@ -148,12 +171,11 @@ switch (status) {
   }
 }
 
-const orders = ref<orderEntity[]>([])
+const orders = ref<OrderEntity[]>([])
 const courses = ref<CourseEntity[]>([])
 const enrollments = ref([])
 const activeTab = ref('profile')
 const isBlocked = ref(false)
-const newPassword = ref('')
 const id = ref('')
 
 const phoneRegex = /^\+375(17|25|29|33|44)\d{7}$/
@@ -166,10 +188,33 @@ onMounted(async () => {
   if (user) {
     student.value = user
   }
-  orders.value = await orderService.getUserOrders(id.value)
-  courses.value = await courseService.getUserCourses(id.value)
+  const blacklist = await authService.getPaginatedBlackList(1, 1000)
+  isBlocked.value = blacklist.items.some(u => u.userId === id.value)
   loading.close()
 })
+
+const setStudent = async () => {
+  try {
+    await authService.setStudent(student.value.userId)
+    ElMessage.success('Пользователь назначен учеником')
+    student.value.role = 1
+  } catch (error) {
+    ElMessage.error('Ошибка при назначении ученика')
+    console.error(error)
+  }
+}
+
+const setAdmin = async () => {
+  try {
+    await authService.setAdmin(student.value.userId)
+    ElMessage.success('Пользователь назначен администратором')
+    student.value.role = 0
+  } catch (error) {
+    ElMessage.error('Ошибка при назначении администратора')
+    console.error(error)
+  }
+}
+
 
 const updatePhone = async () => {
   if (!phoneRegex.test(student.value.phone)) {
@@ -207,6 +252,24 @@ const updateEmail = async () => {
   }
 }
 
+watch(activeTab, async (tab) => {
+  const loading = ElLoading.service({ text: 'Загрузка...' })
+  try {
+    if (tab === 'orders') {
+      orders.value = await orderService.getUserOrders(id.value)
+    }
+    if (tab === 'courses') {
+      courses.value = await courseService.getUserCourses(id.value)
+    }
+  } catch (error) {
+    ElMessage.error('Ошибка загрузки данных')
+    console.error(error)
+  } finally {
+    loading.close()
+  }
+})
+
+
 async function deleteAccount() {
     await ElMessageBox.confirm(
       'Вы уверены, что хотите удалить этот аккаунт?',
@@ -242,6 +305,7 @@ const toggleBlock = async (userId: string) => {
     isBlocked.value = !isBlocked.value
   }
 }
+
 
 </script>
 

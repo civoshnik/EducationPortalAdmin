@@ -1,6 +1,6 @@
 import axios from 'axios'
 import type {OrderServiceItem} from '../interfaces/orderServiceItem'
-import type { orderEntity } from '../interfaces/orderEntity'
+import type { OrderEntity } from '../interfaces/orderEntity'
 import type PaginatedResult from '../interfaces/paginatedResult'
 
 interface OrderItem {
@@ -27,7 +27,7 @@ class OrderService {
     return response.data
   }
 
-  public async getUserOrders(userId: string): Promise<orderEntity[]> {
+  public async getUserOrders(userId: string): Promise<OrderEntity[]> {
     const response = await axios.get('/order/user', { params: { userId } })
     return response.data
   }
@@ -37,15 +37,21 @@ class OrderService {
     return response.data
   }
 
-  public async getPagedOrders(page: number, pageSize: number): Promise<PaginatedResult<orderEntity>> {
-    const response = await axios.get<PaginatedResult<orderEntity>>('/order/paginatedList', { params: { page, pageSize } })
+  public async getPagedOrders(page: number, pageSize: number): Promise<PaginatedResult<OrderEntity>> {
+    const response = await axios.get<PaginatedResult<OrderEntity>>('/order/paginatedList', { params: { page, pageSize } })
     return response.data
   } 
 
-  public async getOrdersByService(serviceId: string): Promise<orderEntity[]> { 
+  public async getOrdersByService(serviceId: string): Promise<OrderEntity[]> { 
     const response = await axios.get('/order/getOrdersByService', { params: { serviceId } }) 
     return response.data 
   }
+
+  public async getOrderById(orderId: string): Promise<OrderEntity> { 
+    const response = await axios.get(`/order/getById/${orderId}`) 
+    return response.data 
+  }
+
 }
 
 export default new OrderService()

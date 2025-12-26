@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2 align="center">Список учеников</h2>
+    <h2 align="center">Список администраторов</h2>
     <el-table :data="students" style="width: 100%" empty-text="Нет данных">
       <el-table-column prop="firstName" label="Имя" />
       <el-table-column prop="lastName" label="Фамилия" />
@@ -57,14 +57,14 @@ const roleText = (role: number) => {
 }
 
 const openStudent = async (id: string) => {
-  await router.push({ path: `/admin/users/${id}`, query: { from: 'studentlist' } })
+  await router.push({ path: `/admin/users/${id}`, query: { from: 'adminlist' } })
 }
 
 const fetchStudents = async () => {
   const loading = ElLoading.service({ text: 'Загрузка...' })
 
   try {
-    const result = await authService.getPaginatedStudentList(page.value, pageSize.value)
+    const result = await authService.getPaginatedAdminList(page.value, pageSize.value)
     students.value = result.items || []
     total.value = result.totalCount || students.value.length
   } catch (error) {

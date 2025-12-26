@@ -5,6 +5,7 @@ import type auth from '../interfaces/auth';
 import type authRespomse from '../interfaces/authResponse'
 import type PaginatedResult from '../interfaces/paginatedResult'
 import type CourseEntity from '../interfaces/courseEntity';
+import type BlackListUserDto from '../dto/blackListUserDto'
 
 
 export interface IAuthService {
@@ -18,6 +19,10 @@ export interface IAuthService {
 
   getPaginatedTeacherList(page: number, pageSize: number) : Promise<PaginatedResult<UserEntity>>
 
+  getPaginatedBlackList(page: number, pageSize: number) : Promise<PaginatedResult<BlackListUserDto>>
+
+  getPaginatedAdminList(page: number, pageSize: number) : Promise<PaginatedResult<UserEntity>>
+
   deleteUser(UserId: string) : Promise<void>
 
   editPhone(UserId: string, Phone: string) : Promise<void>
@@ -27,6 +32,10 @@ export interface IAuthService {
   setUserBlackList(userId: string): Promise<void> 
   
   cancelUserBlackList(userId: string): Promise<void>
+
+  setStudent(userId: string): Promise<void> 
+  
+  setAdmin(userId: string): Promise<void>
 }
 
 export default new class authService implements IAuthService {
@@ -58,6 +67,13 @@ export default new class authService implements IAuthService {
       return response.data
     }
 
+    public async getPaginatedAdminList(page: number, pageSize: number): Promise<PaginatedResult<UserEntity>> {
+      const response = await axios.get('/auth/paginatedAdminList', {
+        params: { page, pageSize }
+        })
+      return response.data
+    }
+
     public async deleteUser(UserId: string): Promise<void> {
       return await axios.delete(`/auth/deleteUser/${UserId}`)
     }
@@ -83,4 +99,20 @@ export default new class authService implements IAuthService {
     public async cancelUserBlackList(userId: string): Promise<void> { 
       await axios.post(`/auth/cancelUserBlackList/${userId}`)
     }
+
+    public async getPaginatedBlackList(page: number, pageSize: number): Promise<PaginatedResult<BlackListUserDto>> {
+      const response = await axios.get('/auth/paginatedBlackList', {
+        params: { page, pageSize }
+        })
+      return response.data
+    }
+
+    public async setStudent(userId: string): Promise<void> {
+      await axios.post(`/auth/setStudent/${userId}`)
+    }
+
+    public async setAdmin(userId: string): Promise<void> {
+      await axios.post(`/auth/setAdmin/${userId}`)
+    }  
+
 }

@@ -1,28 +1,24 @@
 <template>
   <div>
-    <h2 align="center">Список услуг</h2>
+    <h2 align="center">Список тестов</h2>
     <div style="margin: 20px 0; text-align: right;">
-      <el-button type="default" @click="$router.push('/admin/services/create')">
-        Добавить услугу
+      <el-button type="default" @click="$router.push('/admin/tests/create')">
+        Добавить тест
       </el-button>
     </div>
 
-    <el-table :data="services" style="width: 100%">
+    <el-table :data="tests" style="width: 100%">
       <el-table-column prop="name" label="Название" />
-      <el-table-column prop="price" label="Цена (BYN)" />
+      <el-table-column prop="questionCount" label="Кол-во вопросов" />
+      <el-table-column prop="passingScore" label="Проходной балл" />
       <el-table-column label="Создан">
         <template #default="{ row }">
           {{ formatDate(row.createdAt) }}
         </template>
       </el-table-column>
-      <el-table-column label="Изменён">
-        <template #default="{ row }">
-          {{ formatDate(row.modifiedAt) }}
-        </template>
-      </el-table-column>
       <el-table-column label="Действие" width="120">
         <template #default="{ row }">
-          <el-button type="primary" size="small" @click="openService(row.serviceId)">
+          <el-button type="primary" size="small" @click="openTest(row.testId)">
             Открыть
           </el-button>
         </template>
@@ -43,12 +39,12 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import serviceService from '../../../../services/serviceService'
-import type ServiceEntity from '../../../../interfaces/serviceEntity'
+import courseService from '../../../../services/courseService'
+import type TestEntity from '../../../../interfaces/testEntity'
 import { ElLoading } from 'element-plus'
 import router from '@/router'
 
-const services = ref<ServiceEntity[]>([])
+const tests = ref<TestEntity[]>([])
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
@@ -58,29 +54,29 @@ function formatDate(date: string | Date) {
   return new Date(date).toLocaleString('ru-RU')
 }
 
-const fetchServices = async () => {
+const fetchTests = async () => {
   const loading = ElLoading.service({ text: 'Загрузка...' })
   try {
-    const result = await serviceService.getPagedServices(page.value, pageSize.value)
-    services.value = result.items || []
+    const result = await courseService.getPagedTests(page.value, pageSize.value)
+    tests.value = result.items || []
     total.value = result.totalCount || 0
   } catch (error) {
-    console.error('Ошибка загрузки услуг:', error)
-    services.value = []
+    console.error('Ошибка загрузки тестов:', error)
+    tests.value = []
     total.value = 0
   } finally {
     loading.close()
   }
 }
 
-const openService = async (serviceId: string) => {
-  await router.push(`/admin/services/details/${serviceId}`)
+const openTest = async (testId: string) => {
+  await router.push(`/admin/tests/details/${testId}`)
 }
 
 const handlePageChange = (newPage: number) => {
   page.value = newPage
-  fetchServices()
+  fetchTests()
 }
 
-onMounted(fetchServices)
+onMounted(fetchTests)
 </script>

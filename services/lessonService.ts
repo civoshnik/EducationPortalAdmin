@@ -17,6 +17,8 @@ export interface ILessonService {
   updateLesson(entity: createLessonDto): Promise<void>
 
   deleteLesson(lessonId: string) : Promise<void>
+
+  getLessonList() : Promise<LessonEntity[]>
   
 }
 
@@ -50,4 +52,9 @@ export default new class lessonService implements ILessonService {
   public async deleteLesson(lessonId: string): Promise<void> {
     await axios.delete(`/lessons/${lessonId}/delete`)
   }
+
+  public async getLessonList(): Promise<LessonEntity[]> {
+      const response = await axios.get('/lessons/getLessonList')
+      return response.data
+    }
 }
